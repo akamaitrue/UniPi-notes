@@ -1,0 +1,176 @@
+% \documentclass{article}
+% \usepackage{graphicx} % Required for inserting images
+
+% \title{Appunti Cloud Computing}
+% \author{francesco.massellucci }
+% \date{August 2023}
+
+% \begin{document}
+
+% \maketitle
+
+% \section{Introduction}
+
+% \end{document}
+
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{multicol}
+\usepackage[bookmarks]{hyperref}
+\usepackage[a4paper, total={18cm, 25cm}]{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{textcomp}
+\usepackage{listings}
+\usepackage{makecell}
+\lstdefinestyle{customasm}{
+  belowcaptionskip=1\baselineskip,
+  frame=line,
+  xleftmargin=\parindent,
+  language=[x86masm]Assembler,
+  basicstyle=\ttfamily,
+  commentstyle=\itshape\color{purple!40!black},
+}
+\definecolor{backcolour}{RGB}{255,255,255}
+\definecolor{codegreen}{RGB}{27,168,11}
+\definecolor{codeblue}{RGB}{35,35,205}
+\definecolor{codegray}{RGB}{128,128,128}
+\definecolor{codepurple}{RGB}{205,35,56}
+
+% ----  Useful packages % ---- 
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{makecell}
+\usepackage{menukeys} % write keystrokes
+
+\usepackage{wrapfig}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+\graphicspath{ {./images/} }
+
+% Nested Lists
+\renewcommand{\labelenumii}{\arabic{enumi}.\arabic{enumii}}
+\renewcommand{\labelenumiii}{\arabic{enumi}.\arabic{enumii}.\arabic{enumiii}}
+\renewcommand{\labelenumiv}{\arabic{enumi}.\arabic{enumii}.\arabic{enumiii}.\arabic{enumiv}}
+
+% ------- NOTA ------
+\theoremstyle{remark}
+\newtheorem{note}{Note}[subsection]
+% ------- NOTA ------
+
+% ------- OSSERVAZIONE ------
+\theoremstyle{definition}
+\newtheorem{observation}{Osservazione}[subsection]
+% ------- OSSERVAZIONE ------
+
+% ------- DEFINIZIONE ------
+\theoremstyle{plain}
+\newtheorem{definition}{Definizione}[subsection]
+% ------- DEFINIZIONE ------
+
+% ------- ESEMPIO ------
+\theoremstyle{definition}
+\newtheorem{example}{Esempio}[subsection]
+% ------- ESEMPIO ------
+
+% ------- DIMOSTRAZIONE ------
+\theoremstyle{definition}
+\newtheorem{demostration}{Dimotrazione}[subsection]
+% ------- DIMOSTRAZIONE ------
+
+% ------- TEOREMA ------
+\theoremstyle{definition}
+\newtheorem{theorem}{Teorema}[subsection]
+% ------- TEOREMA ------
+
+% ------- COROLLARIO ------
+\theoremstyle{plain}
+\newtheorem{corollaries}{Corollario}[theorem]
+% ------- COROLLARIO ------
+
+% ------- PROPOSIZIONE ------
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposizione}[subsection]
+% ------- PROPOSIZIONE ------
+
+% ---- Footer and header ---- 
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{A.A 2022-2023}
+\fancyhead[RE,LO]{Cloud Computing}
+\fancyfoot[RE,LO]{\rightmark}
+\fancyfoot[LE,RO]{\thepage}
+
+\renewcommand{\headrulewidth}{.5pt}
+\renewcommand{\footrulewidth}{.5pt}
+% ---- Footer and header ---- 
+
+% ----  Language setting ---- 
+\usepackage[italian, english]{babel}
+% ----  Language setting ---- 
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=C,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{\textbf{Cloud Computing}}
+\author{Realizzato da Francesco Massellucci}
+\date{A.A. 2022-2023}
+\fancyfoot[R]{Github: \texttt{\href{https://github.com/akamaitrue}{akamaitrue}}}
+\fancyfoot[L]{Francesco Massellucci}
+
+\begin{document}
+\input{frontespizio}
+
+\tableofcontents
+\newpage
+\maketitle
+\begin{center}
+    \vspace{-20pt}
+    \rule{11cm}{.1pt} 
+\end{center}
+\input{introduction.tex}
+\input{IaaS.tex}
+\input{lab1_aws.tex}
+\input{containers.tex}
+\input{lab2_docker.tex}
+\input{FaaS.tex}
+\input{lab3_lambda.tex}
+\input{PaaS.tex}
+\input{lab4_firebase.tex}
+
+\end{document}

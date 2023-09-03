@@ -1,0 +1,61 @@
+\newpage
+\section{Laboratorio: AWS} \label{lab1}
+
+Hands-on sulle seguenti funzionalità offerte da AWS
+\begin{itemize}
+    \item \textbf{Storage}: Amazon Simple Storage Service (\textbf{S3})
+    \item \textbf{Calcolo}: Amazon Elastic Compute Cloud (\textbf{EC2})
+    \item \textbf{Sicurezza}: AWS Identity and Access Management (\textbf{IAM})
+\end{itemize}
+
+\subsection{Svolgimento}
+\begin{enumerate}
+    \item Creare un \textbf{bucket} su S3
+    
+    \item Creare una coppia di chiavi (\textbf{key pair}) su EC2, key pair scaricato come file con estensione \textit{.pem}
+    
+    \item Creare un'\textbf{istanza EC2} selezionando la coppia di chiavi creata nello step precedente. Per l'istanza abbiamo usato il SO Amazon Linux 2 e \textit{t2.micro} per rispettare il free plan
+    
+    \item Accedere da terminale:
+    \begin{enumerate}
+        \item aprire un terminale nella directory contenente il file \textit{keypair.pem} e inviare il comando \verb|chmod 400 keypair.pem|
+        \item accedere tramite \textbf{SSH} all'istanza EC2: \verb|ssh –i keypair.pem ec2-user@<IPv4_DELLA_MIA_ISTANZA>|
+    \end{enumerate}
+
+    \item Caricare e gestire file tra S3 e EC2 tramite la CLI di AWS:
+    \begin{enumerate}
+        \item caricare un file sul bucket S3
+        \item scaricare il file tramite il terminale dell'istanza con il comando: \verb|aws s3 mv s3://<BUCKET>/<FILE> <LOCAL_PATH>|
+        \begin{itemize}
+            \item Il comando non funziona perché non ho ancora i permessi, infatti per accedere al bucket S3 dalle istanze EC2 è necessario creare un Ruolo IAM per concedere l’accesso
+        \end{itemize}
+    \end{enumerate}
+
+    \item Creare un \textbf{IAM Role}: in questo caso abbiamo garantito accesso completo (\textit{AmazonS3FullAccess})
+
+    \item Aggiungere il Ruolo IAM all’istanza EC2 e riprovare il comando precedente
+    
+\end{enumerate}
+
+\subsection{Caricare un file su S3 da EC2}
+Partendo da un file in locale, caricarlo tramite SSH nell'istanza poi tramite terminale caricare il file dall'istanza al bucket S3
+\begin{lstlisting}[language=bash]
+    scp -i chiavi.pem <FILE> ec2-user@<IPv4_EC2_INST>:<REMOTE_PATH>
+    aws s3 mv <FILE> s3://<BUCKET>
+\end{lstlisting}
+
+\subsection{Bash script per sorting su EC2}
+Scrivere uno script bash che svolga le seguenti funzioni:
+\begin{enumerate}
+    \item Scarica un file dal bucket S3. Il file è formato da una lista non ordinata di interi, uno per riga
+    \item Li ordina
+    \item Carica la lista ordinata su S3
+\end{enumerate}
+Codice:
+\begin{lstlisting}[language=bash]
+    aws s3 mv s3://<BUCKET>/numbers.txt ./numbers.txt
+    sort -n -o numbers.txt numbers.txt
+    aws s3 mv ./numbers.txt s3://<BUCKET>/numbers.txt    
+\end{lstlisting}
+
+\paragraph{Approfondimento} installare un Web Server Apache su un'istanza EC2. \href{https://cloudkatha.com/how-to-install-apache-web-server- on-amazon-linux-2/}{Guida}

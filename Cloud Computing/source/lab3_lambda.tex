@@ -1,0 +1,93 @@
+\newpage
+\section{Laboratorio: AWS Lambda}
+
+\paragraph{Spiegazione}
+La funzione definita nel file (fornito su \href{https://elearning.di.unipi.it/enrol/index.php?id=334}{Moodle}) \verb|lambda_function.py| prende un file .txt all'interno di una cartella di un bucket S3 e ne crea una copia in una cartella \menu{crypted} sempre all'interno dello stesso bucket. Al contempo la cartella originale viene eliminata.\\
+In un'ulteriore cartella \menu{decrypted} ne viene depositata una copia decifrata per verificare che il processo di cifratura sia andata a buon fine
+
+\subsection{Procedimento}
+\begin{enumerate}
+    \item Creare \textbf{IAM role}:
+    \begin{itemize}
+        \item così come per EC2, anche per le Lambda Function dobbiamo prima concedere permessi per interagire con i bucket S3: la creazione di un IAM role per le lambda function è analoga al procedimento per EC2. Come caso d'uso scegliamo \textit{Lambda} e come policy scegliamo \textit{AmazonS3FullAccess}
+    \end{itemize}
+
+    \item Creare \textbf{bucket} S3:
+    \begin{itemize}
+        \item la nostra lambda function lavora interagendo con un bucket S3, quindi creiamo un bucket come abbiamo fatto nel primo laboratorio di AWS (si veda capitolo \ref{lab1}).
+        Creiamo tre cartelle all'interno del Bucket: \menu{crypted/}, \menu{decrypted/}, \menu{plain/}
+    \end{itemize}
+
+    \item Creare la \textbf{Lambda function}:
+    \begin{itemize}
+        \item una volta pronti l'IAM role e il bucket S3, si procede con la creazione della lambda function.\\
+        Settings: specificare \textit{creare da zero}, come runtime usare \verb|python3.8|, scegliere \textit{utliizza un ruolo esistente} e inserire il ruolo IAM creato prima.\\
+        Dopo aver creato la lambda function, inserire il codice di \verb|lambda_function.py| \\
+        Dopo qualsiasi modifica apportata apportata al codice, ricordarsi di clickare su \textbf{Deploy}
+    \end{itemize}
+
+    \item \textbf{Testare} la Lambda function:
+    \begin{itemize}
+        \item generare un evento di test selezionando come struttura quella di default
+        \textbf{reminder}: le Lambda functions lavorano ricevendo in input e rispondendo in output oggetti JSON\\
+        La nostra funzione restituisce il seguente errore:
+        \begin{lstlisting}{json}
+        {
+        "errorMessage": "Unable to import module 'lambda_function': No module named 'cryptography'", 
+        "errorType": "Runtime.ImportModuleError", 
+        "stackTrace": []
+        }
+        \end{lstlisting}
+    \end{itemize}
+
+    \item Creare un livello in AWS Lambda:
+    \begin{itemize}
+        \item quando si crea una funzione in AWS Lambda bisogna specificare il Runtime da utilizzare, tuttavia il Runtime contiene solo librerie di base. Se si vogliono utilizzare altre librerie bisogna creare dei Livelli Lambda che verranno utilizzati dalle nostre funzioni
+        Un \textbf{Livello Lambda} è un archivio di file .zip che può contenere codice o dati aggiuntivi e permette di impacchettare librerie e altre dipendenze da usare insieme alle lambda functions
+        Nel nostro caso, la libreria \verb|cryptography| non fa parte del Runtime quindi dobbiamo inserirla tramite un livello: a tal fine creiamo un nuovo livello utilizzando l'archivio presente su \href{https://elearning.di.unipi.it/enrol/index.php?id=334}{Moodle} (\menu{python.zip}) che contiene già tutto il necessario
+    \end{itemize}
+
+    \item Aggiungere il livello:
+    \begin{itemize}
+        \item Dopo aver creato il livello, dobbiamo aggiungerlo alla nostra funzione cliccando su \textit{aggiungi un livello} $\rightarrow$ \textit{livelli personalizzati} $\rightarrow$ scegliere il livello appena creato e la versione di default.\\
+        Adesso, riprovando ad eseguire il test, otteniamo un errore diverso:
+        \begin{lstlisting}{json}
+        { 
+        "errorMessage": "'Records'",
+        "errorType": "KeyError",
+        "stackTrace": [ " File \"/var/task/lambda_function.py\", line 42, in lambda_handler\n for record in event['Records']:\n" ]
+        }
+        \end{lstlisting}
+        questo errore indica che la funzione va in esecuzione ma l'input che riceve è mal formattato. Infatti, abbiamo usato un input di default e adesso dobbiamo creare un input che possa essere eseguito dalla funzione
+    \end{itemize}
+
+    \item Creare un livello in AWS Lambda:
+    \begin{itemize}
+        \item come evento possiamo usare il seguente, in cui sostituire \textit{BUCKET} con il nome del nostro bucket e, prevedibilmente, \textit{FILENAME} con il nome di un file .txt da cifrare, tra quelli precedentemente caricati nella cartella \menu{plain/} del nostro bucket
+        \begin{lstlisting}{json}
+            {
+            "Records": [
+              { "s3": { 
+                        "bucket": { "name": "BUCKET" },
+                        "object": { "key": "plain/FILENAME" } 
+                        } 
+              } ]
+            }
+        \end{lstlisting}
+    \end{itemize}
+
+    \item Aggiungere un \textbf{Trigger}:
+    
+    è possibile automatizzare l'esecuzione delle Lambda Functions in modo che vengano lanciate automaticamente ogni volta che si verifica un determinato evento.\\
+    Nel nostro caso vogliamo che l'esecuzione della lambda function sia triggerata ogni volta che viene caricato un file nella cartella \menu{plain/} del bucket: per fare ciò, clickare su \textit{Aggiungi trigger} $\rightarrow$ scegliere S3 come origine e cliccare sul bucket di interesse $\rightarrow$ tipo di evento: \textit{tutti gli eventi di creazione oggetti} $\rightarrow$ aggiungere \textbf{.txt} come suffisso per far sì che la funzione venga chiamata solo quando il file caricato è un file testuale $\rightarrow$ accettare le condizioni sull'invocazione ricorsiva
+    
+\end{enumerate}
+
+\subsection{Esercizi facoltativi (consigliati)}
+\begin{enumerate}
+    \item Test: verificare i casi limite o di errore, e.g. il file non è presente nel bucket o il bucket non è stato creato
+
+    \item Analizzare il codice della funzione ed eliminare le parti di codice che eliminano il file originale dopo la cifratura
+
+    \item Leggere la \href{https://docs.aws.amazon.com/it_it/lambda/latest/dg/services-apigateway- tutorial.html}{documentazione AWS su Lambda e API gateway} (link \href{https://docs.aws.amazon.com/it_it/lambda/latest/dg/services-apigateway- tutorial.html}{here})
+\end{enumerate}

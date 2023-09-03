@@ -1,0 +1,71 @@
+\newpage
+\section{Laboratorio: Docker}
+
+\subsection{Esercizi svolti in aula}
+\paragraph{Docker docs} \href{https://docs.docker.com/engine/reference/commandline/run/}{Documentazione a questo link}
+\begin{enumerate}
+    \item Eseguire il comando \verb|docker run hello-world| e riportare l’output ottenuto
+    \item Se si riesegue il comando precedente, la sua esecuzione è più veloce? Se sì, perché?
+    \begin{itemize}
+        \item Sì, perché docker riesce a trovare l’immagine in locale. Infatti durante la seconda esecuzione non verrà stampata a video il messaggio \verb|Unable to find image ‘hello-world:latest’ locally|
+    \end{itemize}
+    \item Spiegare cosa fa il seguente comando, compresi i flags: \verb|docker run -i -t debian /bin/bash|
+    \begin{itemize}
+        \item \verb|docker| lancia docker
+        \item \verb|run| prima crea un nuovo livello scrivibile del container sopra l’immagine specificata e poi manda in esecuzione il container con un’istanza dell’immagine “debian”
+        \item \verb|-t| permette di allocare una sessione virtuale del terminale all’interno del container 
+        \item \verb|/bin/bash| manda in esecuzione una bash all’interno del container su cui gira l’immagine debian
+    \end{itemize}
+
+    \item Dopo aver eseguito il comando precedente, cosa succede eseguendo il comando exit? Perché?
+    \begin{itemize}
+        \item Il comando exit permette di effettuare il logout dalla shell collegata al container creato in precedenza (equivalente a \keys{\ctrl + D} / \keys{\ctrl + C} ). Nel caso in questione con il comando exit viene terminato anche il container, perché /bin/bash è l’unico eseguibile in esecuzione sul container
+    \end{itemize}
+    \item Eseguire il comando che permette di ottenere la lista delle immagini al momento presenti sulla propria macchina: \verb|docker image ls|
+    \begin{itemize}
+        \item \href{https://docs.docker.com/engine/reference/commandline/images/}{Documentazione per docker images a questo link}
+    \end{itemize}
+    \item Eseguire il comando che permette di ottenere la lista sia dei container in esecuzione che di quelli eseguiti: \verb|docker ps -a|
+    Questo comando mostra tutti i container eseguiti ed in esecuzione. (flag \verb|-a| = all, per indicare tutti i container)
+
+    \item Qual è la differenza in un Dockerfile tra i comandi \verb|RUN| e \verb|CMD|?
+    \begin{itemize}
+        \item \verb|RUN| viene usato durante la build. Ogni run crea un nuovo layer intermedio. In un Dockerfile possono essere presenti molti comandi \verb|RUN|
+        \item \verb|CMD| viene usato per eseguire un comando quando ci lancia un container. In un Dockerfile deve essere presente un solo comando \verb|CMD|
+    \end{itemize}
+    \item Containerizzare ed eseguire su Docker la cartella \menu{DockerApp} presente su \href{https://elearning.di.unipi.it/enrol/index.php?id=334}{Moodle} e scrivere tutti gli step ed i comandi necessari e gli eventuali flag utilizzati. Verificare che anche l’applicazione containerizzata sia disponibile su \verb|http://127.0.0.1:5000/|\\
+    Suggerimento: come immagine di partenza usare \verb|python:3.8-slim-buster|    
+
+    \begin{enumerate}
+        \item Creare il Dockerfile
+        \begin{lstlisting}
+        FROM python:3.8-slim-buster
+        ADD . /app
+        WORKDIR /app
+        RUN pip install -r requirements.txt
+        EXPOSE 5000
+        CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]    
+        \end{lstlisting}
+        
+        \item \verb|docker build -t myapp .|
+        \begin{itemize}
+            \item Il comando \verb|build| costruisce un’immagine Docker a partire dal Dockerfile e da un contesto, ovvero l’insieme di files specificati nel PATH o URL passato come parametro. Il processo di build può riferirsi ad ogni file presente nel contesto.
+            \item Il flag \verb|-t| è diverso da quello che utilizziamo nella run, qui ha il significato di \verb|tag|, ovvero taggare (nominare) l’immagine che sto creando.
+        \end{itemize}
+
+        \item \verb|docker run -p 5000:5000 myapp|
+
+        \begin{itemize}
+            \item Il flag \verb|-p| (\textit{—publish}) serve a “pubblicare” una porta del container all’host, ovvero a renderla visibile ed usabile nei confronti dell’host. In questo caso la porta dell’host e del container sono la stessa (5000), nel formato \textit{hostPort:containerPort}
+        \end{itemize}
+
+        \item Ridigitare il comando \verb|docker image ls| e verificare cosa è cambiato:
+        \begin{itemize}
+            \item Ans: risulta una nuova immagine chiamata \textit{myapp}
+        \end{itemize}
+        
+    \end{enumerate}
+    
+\end{enumerate}
+
+\paragraph{Approfondimento} Seguire \href{https://docs.docker.com/compose/gettingstarted/}{la seguente guida} per provare \textbf{docker-compose}
