@@ -5,7 +5,7 @@ Tuttavia, se qualcuno desiderasse la versione in MD, può contattarmi senza prob
 
 ## Roadmap
 Sto riscrivendo gli appunti seguendo il seguente ordine:
-1. Cloud Computing
+1. Cloud Computing [to be completed...]
 1.  Green Computing
 1. Architetture degli Elaboratori e Sistemi Operativi (AESO)
 1. others...
